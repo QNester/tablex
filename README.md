@@ -8,7 +8,7 @@ Render your structs with [go-pretty/table](https://github.com/jedib0t/go-pretty/
 
 ## Usage
 
-1. Setup your table (see more in [go-pretty/table doc](https://github.com/jedib0t/go-pretty/tree/main/table))
+1. Set up your table (see more in [go-pretty/table doc](https://github.com/jedib0t/go-pretty/tree/main/table))
 2. Add `tablex` as a tag to your struct type
 3. Render the table via Renderer interface.
 
@@ -48,7 +48,7 @@ Show [examples](./internal/examples) for more usage information.
 renderer := tablex.NewRenderer(
   writer,
   tablex.RendererOptions{
-    EmptyValue: "no data",               // what you wanna see if some of your fields' data equals nil
+    EmptyValue: "no data",               // what you want to see if some of your fields' data equals nil
     Format:     tablex.RenderFormatHTML, // rendering format
   },
 )

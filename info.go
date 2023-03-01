@@ -1,10 +1,13 @@
 package tablex
 
 import (
+	"errors"
 	"reflect"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 )
+
+var ObjectIsNotStruct = errors.New("tablex_error: received object is not a structure")
 
 type tablexInfo struct {
 	isCollection bool
@@ -16,7 +19,7 @@ type tablexInfo struct {
 	fields  map[structFieldName]*fieldInfo
 }
 
-func newTablexInfo(obj interface{}, emptyVal string) *tablexInfo {
+func newTablexInfo(obj interface{}, emptyVal string) (*tablexInfo, error) {
 	var isCollection bool
 
 	reflType := getReflectType(obj)
@@ -24,6 +27,10 @@ func newTablexInfo(obj interface{}, emptyVal string) *tablexInfo {
 	if reflType.Kind() == reflect.Slice || reflType.Kind() == reflect.Array {
 		isCollection = true
 		reflType = reflType.Elem()
+	}
+
+	if reflType.Kind() != reflect.Struct {
+		return nil, ObjectIsNotStruct
 	}
 
 	tInfo := &tablexInfo{
@@ -35,13 +42,10 @@ func newTablexInfo(obj interface{}, emptyVal string) *tablexInfo {
 	tInfo.loadFields()
 	tInfo.loadHeaders()
 
-	return tInfo
+	return tInfo, nil
 }
 
 func (tx *tablexInfo) loadFields() {
-	if tx.reflType.Kind() == reflect.Ptr {
-		tx.reflType = tx.reflType.Elem()
-	}
 	tx.fields = make(map[structFieldName]*fieldInfo)
 	lastIdx := 0
 

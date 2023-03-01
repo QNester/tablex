@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// nolint:unused
 type getTablexTagsTestStruct struct {
 	fieldWithHeader                  string  `tablex:"header:good_header"`
 	fieldWithHeaderPtr               *string `tablex:"header:ptr_header"`
@@ -13,6 +14,7 @@ type getTablexTagsTestStruct struct {
 	skipMark                         string  `tablex:"-"`
 	fieldWithAnotherTagWithoutHeader string  `tablex:"another_tag:good_header"`
 	fieldWithAnotherTagWithHeader    string  `tablex:"header:good,another_tag:another"`
+	oneWordField                     string  `tablex:"anything"`
 }
 
 func Test_getTablexTags(t *testing.T) {
@@ -68,6 +70,12 @@ func Test_getTablexTags(t *testing.T) {
 			args:  args{field: reflType.Field(6)},
 			want:  reflType.Field(6).Type,
 			want1: map[string]string{"header": "good", "another_tag": "another"},
+		},
+		{
+			name:  "field with one word in tage",
+			args:  args{field: reflType.Field(7)},
+			want:  nil,
+			want1: nil,
 		},
 	}
 	for _, tt := range tests {
