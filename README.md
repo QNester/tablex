@@ -1,6 +1,6 @@
 # Tablex
 
-[![Release](https://github.com/QNester/tablex/actions/workflows/release.yml/badge.svg)](https://github.com/QNester/tablex/actions/workflows/release.yml)
+[![Tests](https://github.com/QNester/tablex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/QNester/tablex/actions/workflows/tests.yml)
 
 Render your structs with [go-pretty/table](https://github.com/jedib0t/go-pretty/tree/main/table) in go-way tags.
 
