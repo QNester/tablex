@@ -26,10 +26,6 @@ func getTablexTags(field reflect.StructField) (reflect.Type, tablexTags) {
 }
 
 func parseTablexTags(rawTagVal string) tablexTags {
-	if rawTagVal == "" {
-		return tablexTags{}
-	}
-
 	pairs := strings.Split(rawTagVal, ",")
 	tags := make(tablexTags)
 	for _, pair := range pairs {

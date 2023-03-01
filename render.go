@@ -4,7 +4,9 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+// DefaultEmptyValue default value for nullable columns
 const DefaultEmptyValue = "null"
+
 const RenderFormatTable RenderFormat = "table"
 const RenderFormatCSV RenderFormat = "csv"
 const RenderFormatHTML RenderFormat = "html"
@@ -13,6 +15,8 @@ const DefaultRenderFormat = RenderFormatTable
 
 type RenderFormat string
 
+// Writer is a slice of table.Writer interface
+//
 //go:generate mockery --output ./mock --name Writer --structname WriterMock
 type Writer interface {
 	AppendRow(row table.Row, configs ...table.RowConfig)
@@ -25,11 +29,14 @@ type Writer interface {
 	AppendHeader(row table.Row, configs ...table.RowConfig)
 }
 
+// Renderer is a main interface of the tablex package
+//
 //go:generate mockery --output ./mock --name Renderer --structname RendererMock
 type Renderer interface {
-	Render(interface{}) string
+	Render(interface{}) (string, error)
 }
 
+// RendererOptions is specific options for tablex behaviour
 type RendererOptions struct {
 	EmptyValue string
 	Format     RenderFormat
@@ -40,7 +47,9 @@ type tableRenderer struct {
 	options RendererOptions
 }
 
-func NewRenderer(writer table.Writer, options ...RendererOptions) Renderer {
+// NewRenderer returns an structure implemented Renderer interface
+// It dependents on Writer interfaces (part of interface in https://github.com/jedib0t/go-pretty/tree/main/table)
+func NewRenderer(writer Writer, options ...RendererOptions) Renderer {
 	var renderOptions RendererOptions
 
 	if len(options) != 0 {
@@ -52,16 +61,26 @@ func NewRenderer(writer table.Writer, options ...RendererOptions) Renderer {
 	return &tableRenderer{writer: writer, options: renderOptions}
 }
 
-func (r *tableRenderer) Render(obj interface{}) string {
-	r.appendData(obj)
-	return r.writerRender()
+// Render is a function for build table from structs or collections.
+func (r *tableRenderer) Render(obj interface{}) (string, error) {
+	err := r.appendData(obj)
+	if err != nil {
+		return "", err
+	}
+
+	return r.writerRender(), nil
 }
 
-func (r *tableRenderer) appendData(obj interface{}) {
-	tInfo := newTablexInfo(obj, r.options.EmptyValue)
+func (r *tableRenderer) appendData(obj interface{}) error {
+	tInfo, err := newTablexInfo(obj, r.options.EmptyValue)
+	if err != nil {
+		return err
+	}
 
 	r.writer.AppendHeader(tInfo.headers)
 	r.writer.AppendRows(tInfo.rowsForObject(obj))
+
+	return nil
 }
 
 func (r *tableRenderer) writerRender() string {
