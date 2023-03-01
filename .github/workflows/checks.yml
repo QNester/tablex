@@ -1,0 +1,42 @@
+name: "Checks"
+on:
+  workflow_call:
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.17'
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.51.2
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.18', '1.19', '1.20']
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Test
+        run: go test -v $(go list ./... | grep -v /internal/example) -coverprofile=coverage.out
+      - name: Set coverage to env
+        run: echo "COVERAGE=$(go tool cover -func coverage.out | grep total | awk '{print substr($3, 1, length($3)-3)}')" >> $GITHUB_ENV
+      - name: Check coverage
+        run: |
+          if [[ $COVERAGE -gt 90 ]]
+          then
+            exit 0;
+          else
+            echo "ERROR: Tests coverage less than 90 ($COVERAGE)";
+            exit 1;
+          fi
+        shell: bash
