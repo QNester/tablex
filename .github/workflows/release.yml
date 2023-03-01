@@ -1,0 +1,49 @@
+name: "Release"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag in format X.X.X (example: 1.0.1)"
+        required: true
+      changelog:
+        description: "Changelog body"
+        required: false
+        default: "Description is not provided :("
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+
+  check_inputs:
+    runs-on: ubuntu-latest
+    needs: checks
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+            [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        shell: bash
+
+  create-tag:
+    runs-on: ubuntu-latest
+    needs: check_inputs
+    steps:
+      - uses: actions/checkout@v3
+      - uses: rickstaa/action-create-tag@v1
+        id: "tag_create"
+        with:
+          tag: v${{ github.event.inputs.version }}
+          tag_exists_error: true
+
+  release:
+    runs-on: ubuntu-latest
+    needs: create-tag
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          body: ${{ github.event.inputs.changelog }}
+
