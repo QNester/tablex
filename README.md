@@ -45,11 +45,10 @@ Show [examples](./internal/examples) for more usage information.
 ### Additional information
 1. Use `tablex.RenderOptions` to set default empty value and table format (Text Table/CSV/HTML/MD)
 ```go
-writer := table.NewWriter()
 renderer := tablex.NewRenderer(
   writer,
   tablex.RendererOptions{
-    EmptyValue: "no data",                  // what you wanna see if some of your fields' data equals nil
+    EmptyValue: "no data",               // what you wanna see if some of your fields' data equals nil
     Format:     tablex.RenderFormatHTML, // rendering format
   },
 )
