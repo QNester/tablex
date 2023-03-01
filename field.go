@@ -68,7 +68,7 @@ func (fi *fieldInfo) getFieldValue(reflValue reflect.Value, emptyVal string) int
 		reflValue = reflValue.FieldByName(fName)
 	}
 
-	if !reflValue.IsValid() {
+	if !reflValue.IsValid() || (reflValue.Kind() == reflect.Ptr && reflValue.IsNil()) {
 		return emptyVal
 	}
 

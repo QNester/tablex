@@ -25,8 +25,9 @@ type Writer interface {
 	AppendHeader(row table.Row, configs ...table.RowConfig)
 }
 
+//go:generate mockery --output ./mock --name Renderer --structname RendererMock
 type Renderer interface {
-	Render(interface{})
+	Render(interface{}) string
 }
 
 type RendererOptions struct {
@@ -51,9 +52,9 @@ func NewRenderer(writer table.Writer, options ...RendererOptions) Renderer {
 	return &tableRenderer{writer: writer, options: renderOptions}
 }
 
-func (r *tableRenderer) Render(obj interface{}) {
+func (r *tableRenderer) Render(obj interface{}) string {
 	r.appendData(obj)
-	r.writerRender()
+	return r.writerRender()
 }
 
 func (r *tableRenderer) appendData(obj interface{}) {
@@ -63,15 +64,15 @@ func (r *tableRenderer) appendData(obj interface{}) {
 	r.writer.AppendRows(tInfo.rowsForObject(obj))
 }
 
-func (r *tableRenderer) writerRender() {
+func (r *tableRenderer) writerRender() string {
 	switch r.options.Format {
 	case RenderFormatCSV:
-		r.writer.RenderCSV()
+		return r.writer.RenderCSV()
 	case RenderFormatHTML:
-		r.writer.RenderHTML()
+		return r.writer.RenderHTML()
 	case RenderFormatMD:
-		r.writer.RenderMarkdown()
+		return r.writer.RenderMarkdown()
 	default:
-		r.writer.Render()
+		return r.writer.Render()
 	}
 }
