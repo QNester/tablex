@@ -42,7 +42,7 @@ Result of the running this program:
 +---+------------+
 ```
 
-Show [examples](./internal/examples) for more usage information.
+See more [examples](./internal/examples) for usage information.
 
 ### Additional information
 1. Use `tablex.RenderOptions` to set default empty value and table format (Text Table/CSV/HTML/MD)
